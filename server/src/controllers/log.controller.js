@@ -20,20 +20,20 @@ controller.create = async (req, res) => {
         sentences,
         item_role
     );
+
+    // Lấy toàn bộ log trước đó
+    const logs = await Log.findByHistory(history_id);
+
+    // 1. System role - hướng dẫn AI
+    const recentLogs = logs.slice(-20);
+    const messages = recentLogs.map(log => ({
+        role: log.item_role === "system" ? "assistant" : "user",
+        content: log.sentences
+    }));
+
+    const prompt = `Based on the context I provide, Answer the question below and then return 3 follow-up question suggestions to continue the conversation.\nFormat your response as a JSON object with two fields: \"answer\" and \"suggestions\".\n\nExample:\n{\n  \"answer\": \"Sure, here is the explanation...\",\n  \"suggestions\": [\"Can you give me an example?\", \"How does this apply in real life?\", \"What are the benefits?\"]\n}\n\nQuestion: ${sentences}`
+    
     // Prompt gửi cho AI
-    // const prompt = `
-    //     Answer the following user message.  
-    //     Then provide 3 follow-up question suggestions.
-    //     Return as JSON:
-    //     {
-    //     "answer": "...",
-    //     "suggestions": ["...", "...", "..."]
-    //     }
-
-    //     User message: "${sentences}"
-    // `;
-
-    const prompt = `Answer the question below, and then return 3 follow-up question suggestions to continue the conversation.\nFormat your response as a JSON object with two fields: \"answer\" and \"suggestions\".\n\nExample:\n{\n  \"answer\": \"Sure, here is the explanation...\",\n  \"suggestions\": [\"Can you give me an example?\", \"How does this apply in real life?\", \"What are the benefits?\"]\n}\n\nQuestion: ${sentences}`
 
     // Gọi OpenAI
     // const completion = await openai.chat.completions.create({
@@ -44,7 +44,10 @@ controller.create = async (req, res) => {
     // Gọi OpenRouter
     const completion = await openrouter.chat.send({
         model: "openai/gpt-3.5-turbo",
-        messages: [{ role: "user", content: prompt }],
+        messages: [
+            ...messages,
+            { role: "user", content: prompt },
+        ],
         max_tokens: 8000
     });
 
@@ -111,7 +114,7 @@ controller.translate = async (req, res) => {
 
     res
         .status(200)
-        .json(new ApiResponse(200, { translatedText }, "Find log list successfully"));
+        .json(new ApiResponse(200, { translatedText }, "Successful translation"));
 };
 
 //chưa có api
