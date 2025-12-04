@@ -14,7 +14,7 @@ export default function ChatPage() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    console.log(activeChat);
+    // console.log(activeChat);
     if (activeChat) {
       loadChat(activeChat);
     }
@@ -89,7 +89,7 @@ export default function ChatPage() {
       const res = await http.post(`/history`);
       const id = res.data.data.id;
       loadHistory();
-      loadChat(id);
+      // loadChat(id); //bỏ phần này đi ko thôi bị lỗi khi không chọn vào id nào
       setActiveChat(id);
       setLoading(false);
       setError(null);
@@ -155,7 +155,7 @@ export default function ChatPage() {
     if (!id) return;
 
     const index = history.findIndex((item) => item.id === id);
-    console.log(index);
+    // console.log(index);
     if (index === -1) return; // không tìm thấy thì thoát
 
     const updated = [...history];
@@ -213,12 +213,13 @@ export default function ChatPage() {
           </div>
 
           <ChatUI
-            key={messages}
+            // key={activeChat}
             messages={messages}
             setMessages={setMessages}
             saveChat={saveChatToHistory}
             activeChat={activeChat}
             createNewChat={createNewChat}
+            setActiveChat={setActiveChat}
           />
         </div>
       </div>

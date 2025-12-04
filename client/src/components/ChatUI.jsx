@@ -13,6 +13,7 @@ export default function ChatUI({
   saveChat,
   activeChat,
   createNewChat,
+  setActiveChat,
 }) {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -64,7 +65,7 @@ export default function ChatUI({
     const text = input.trim();
     if (!text) return;
     // if (!activeChat) return;
-
+    // console.log(messages);
     let chatId = activeChat;
     if (!chatId) {
       chatId = await createNewChat();
