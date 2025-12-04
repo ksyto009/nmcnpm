@@ -20,5 +20,31 @@ controller.getAll = async (req, res) => {
         );
 }
 
+controller.delete = async (req, res) => {
+    let { history_id } = req.params;
+    let user_id = req.user.id
+
+    if (!history_id) {
+        throw new ApiError(400, "history_id is required");
+    }
+    if (isNaN(history_id)) {
+        throw new ApiError(400, "id must be integer");
+    }
+
+    history_id = parseInt(history_id);
+
+    const deleted = await History.deleteIfOwner(history_id, user_id);
+    console.log(deleted)
+    if (!deleted) {
+        throw new ApiError(403, "You are not allowed to delete this history");
+    }
+
+    res
+        .status(200)
+        .json(
+            new ApiResponse(200, null, "History deleted successfully")
+        );
+
+}
 
 module.exports = controller;
