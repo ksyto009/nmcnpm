@@ -213,6 +213,7 @@ export default function ChatPage() {
           </div>
 
           <ChatUI
+            key={messages}
             messages={messages}
             setMessages={setMessages}
             saveChat={saveChatToHistory}
