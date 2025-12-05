@@ -89,7 +89,7 @@ export default function ChatPage() {
       const res = await http.post(`/history`);
       const id = res.data.data.id;
       loadHistory();
-      // loadChat(id); //bỏ phần này đi ko thôi bị lỗi khi không chọn vào id nào
+      //loadChat(id); //bỏ phần này đi ko thôi bị lỗi khi không chọn vào id nào
       setActiveChat(id);
       setLoading(false);
       setError(null);
@@ -219,7 +219,6 @@ export default function ChatPage() {
             saveChat={saveChatToHistory}
             activeChat={activeChat}
             createNewChat={createNewChat}
-            setActiveChat={setActiveChat}
           />
         </div>
       </div>
