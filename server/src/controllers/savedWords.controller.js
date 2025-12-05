@@ -46,7 +46,7 @@ controller.delete = async (req, res) => {
 
     id = parseInt(id);
 
-    const deleted = await History.deleteIfOwner(id, user_id);
+    const deleted = await SavedWord.deleteIfOwner(id, user_id);
 
     if (!deleted) {
         throw new ApiError(403, "You are not allowed to delete this word");
