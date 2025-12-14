@@ -27,7 +27,7 @@ export default function DictionaryModal({ show, onHide, word }) {
     setLoading(false);
   };
 
-  const saveWord = async () => {z
+  const saveWord = async () => {
     try {
       await http.post("/saved-words", {
         word,
