@@ -36,7 +36,6 @@ export default function ChatPage() {
       const res = await http.get(`/history`);
       const data = res.data.data;
       setHistory(data);
-      console.log(data)
       setLoading(false);
       setError(null);
     } catch (err) {
