@@ -38,6 +38,7 @@ const initializeDatabase = async () => {
             CREATE TABLE IF NOT EXISTS historys (
                 id INT PRIMARY KEY AUTO_INCREMENT,
                 user_id INT,
+                title VARCHAR(255) DEFAULT 'New Chat',
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP NULL,
                 deleted_at TIMESTAMP NULL,
