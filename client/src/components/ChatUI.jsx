@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { http } from "../lib/http";
+import DictionaryModal from "./DictionaryModal";
 
 // Lay doi tuong SpeechRecognition
 const getSpeechRecognition = () => {
@@ -20,10 +21,37 @@ export default function ChatUI({
   const [error, setError] = useState("");
 
   const [isListening, setIsListening] = useState(false);
-  const [autoSpeak, setAutoSpeak] = useState(true);
+  const [autoSpeak, setAutoSpeak] = useState(
+    localStorage.getItem("autoSpeak") === "true"
+  );
+  const [autoMode, setAutoMode] = useState(
+    localStorage.getItem("autoMode") === "true"
+  );
+
+  const [selectedWord, setSelectedWord] = useState("");
+  const [showDict, setShowDict] = useState(false);
 
   const bottomRef = useRef(null);
   const recognitionRef = useRef(null);
+
+  const openDictionary = (word) => {
+    if (!word.trim()) return;
+    const clean = word.replace(/[^a-zA-Z]/g, "");
+    if (!clean) return;
+    setSelectedWord(clean);
+    setShowDict(true);
+  };
+
+  //  Khi settings thay doi
+  useEffect(() => {
+    const reloadSettings = () => {
+      setAutoSpeak(localStorage.getItem("autoSpeak") === "true");
+      setAutoMode(localStorage.getItem("autoMode") === "true");
+    };
+
+    window.addEventListener("settings-updated", reloadSettings);
+    return () => window.removeEventListener("settings-updated", reloadSettings);
+  }, []);
 
   // Scroll xuong khi co tin nhan moi
   useEffect(() => {
@@ -77,9 +105,6 @@ export default function ChatUI({
         finalText = transcript;
         setInput(transcript);
       }
-      // else {
-      //   setInput(transcript);
-      // }
     };
 
     recognition.onerror = (e) => {
@@ -99,6 +124,7 @@ export default function ChatUI({
 
   // TTS
   const playTTS = async (text) => {
+    if (!autoSpeak) return; //tắt autoSpeak
     try {
       const response = await http.post(
         "/log/tts",
@@ -177,9 +203,9 @@ export default function ChatUI({
     };
   }, []);
 
-  // =============================
-  // UI Component
-  // =============================
+  const lastAssistantMsg = messages.filter((m) => m.suggestions)?.slice(-1)[0];
+  const lastSuggestions = lastAssistantMsg?.suggestions || [];
+
   return (
     <div className="chat-container">
       <div className="chat-messages">
@@ -191,22 +217,16 @@ export default function ChatUI({
             }`}
           >
             <div className="message-bubble">
-              {m.sentences}
-
-              {/* suggestions */}
-              {m.suggestions && m.suggestions.length > 0 && (
-                <div className="suggestions-box">
-                  {m.suggestions.map((s, idx) => (
-                    <button
-                      key={idx}
-                      className="suggestion-btn"
-                      onClick={() => setInput(s)}
-                    >
-                      {s}
-                    </button>
-                  ))}
-                </div>
-              )}
+              {/* hiển thị từng từ để click */}
+              {m.sentences.split(" ").map((w, idx) => (
+                <span
+                  key={idx}
+                  className="word"
+                  onClick={() => openDictionary(w)}
+                >
+                  {w + " "}
+                </span>
+              ))}
             </div>
           </div>
         ))}
@@ -214,15 +234,35 @@ export default function ChatUI({
         {typing && (
           <div className="message-row message-assistant">
             <div className="typing-bubble">
-              <span className="dot"></span>
-              <span className="dot"></span>
-              <span className="dot"></span>
+              <span className="typing-dot"></span>
+              <span className="typing-dot"></span>
+              <span className="typing-dot"></span>
             </div>
           </div>
         )}
 
         <div ref={bottomRef} />
+
+        <DictionaryModal
+          show={showDict}
+          onHide={() => setShowDict(false)}
+          word={selectedWord}
+        />
       </div>
+
+      {lastSuggestions.length > 0 && (
+        <div className="suggestions-bar">
+          {lastSuggestions.map((s, i) => (
+            <button
+              key={i}
+              className="suggestion-pill"
+              onClick={() => setInput(s)}
+            >
+              {s}
+            </button>
+          ))}
+        </div>
+      )}
 
       <div className="chat-input-row">
         <button

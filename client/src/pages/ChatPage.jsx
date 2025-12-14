@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import Sidebar from "../components/Sidebar";
 import ChatUI from "../components/ChatUI";
 import { http } from "../lib/http";
+import ModalVocabulary from "../components/ModalVocabulary";
+import ModalSettings from "../components/ModalSettings";
 
 export default function ChatPage() {
   const [history, setHistory] = useState([]);
@@ -12,6 +14,13 @@ export default function ChatPage() {
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const [showVocab, setShowVocab] = useState(false);
+
+  const openVocab = () => setShowVocab(true);
+  const closeVocab = () => setShowVocab(false);
+
+  const [showSettings, setShowSettings] = useState(false);
 
   useEffect(() => {
     // console.log(activeChat);
@@ -27,6 +36,7 @@ export default function ChatPage() {
       const res = await http.get(`/history`);
       const data = res.data.data;
       setHistory(data);
+      console.log(data)
       setLoading(false);
       setError(null);
     } catch (err) {
@@ -199,8 +209,10 @@ export default function ChatPage() {
         activeChat={activeChat}
         theme={theme}
         toggleTheme={toggleTheme}
+        openVocab={openVocab}
+        setShowSettings={setShowSettings}
       />
-
+      <ModalVocabulary show={showVocab} onHide={closeVocab} />
       <div className="chat-area">
         <div className="top-right-header">
           <button className="logout-btn" onClick={logout}>
@@ -222,6 +234,10 @@ export default function ChatPage() {
           />
         </div>
       </div>
+      <ModalSettings
+        show={showSettings}
+        onHide={() => setShowSettings(false)}
+      />
     </div>
   );
 }

@@ -21,6 +21,8 @@ export default function Sidebar({
   activeChat,
   theme,
   toggleTheme,
+  openVocab,
+  setShowSettings,
 }) {
   const [renameIndex, setRenameIndex] = useState(null);
   const [renameValue, setRenameValue] = useState("");
@@ -103,7 +105,7 @@ export default function Sidebar({
       </div>
 
       <div className="bottom-section">
-        <button className="sidebar-item">
+        <button className="sidebar-item" onClick={() => openVocab()}>
           <FaBook />
           {!collapsed && <span>Vocabulary</span>}
         </button>
@@ -115,7 +117,7 @@ export default function Sidebar({
           )}
         </button>
 
-        <button className="sidebar-item small">
+        <button className="sidebar-item" onClick={() => setShowSettings(true)}>
           <FaCog />
           {!collapsed && <span>Settings</span>}
         </button>
