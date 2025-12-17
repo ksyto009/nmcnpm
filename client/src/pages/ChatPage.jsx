@@ -182,8 +182,6 @@ export default function ChatPage() {
       const response = await http.post("/user/logout");
 
       if (response.status === 200) {
-        localStorage.removeItem("token");
-        window.location.href = "/login";
       } else {
         console.error("Lỗi khi logout từ server:", response);
       }
@@ -193,6 +191,8 @@ export default function ChatPage() {
         err?.response?.data?.message || err?.message || "Đăng nhập thất bại!"
       );
     }
+    localStorage.removeItem("token");
+    window.location.href = "/login";
   };
 
   return (
